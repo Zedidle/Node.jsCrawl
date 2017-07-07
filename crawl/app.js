@@ -5,8 +5,11 @@ var fs = require('fs');
 var request = require("request"); 
 var cheerio = require("cheerio"); 
 var async = require('async'); 
-//目标网址 
-var url = 'http://www.ivsky.com/tupian/ziranfengguang/'; 
+
+//目标网址(域名) 
+var url = 'http://www.4xart.com/'; 
+
+
 //本地存储目录 
 var dir = './images'; 
 var setting = require('./setting'); 
@@ -47,7 +50,7 @@ function requestall(url) {
         }); 
         downloadImg(photos, dir, setting.download_v); 
 
-        // 递归爬虫,每一层递归都会赋予一个新的下载时间
+        // 利用href递归爬虫,每一层递归都会赋予一个新的下载时间
         $('a').each(function () { 
           var murl = $(this).attr('href'); 
           if (IsURL(murl)) { 
@@ -57,13 +60,23 @@ function requestall(url) {
             timeout += setting.ajax_timeout; 
           } else { 
             setTimeout(function () { 
-            	console.log(murl)
-              //设置各种递归情况
-              fetchre("http://www.ivsky.com/" + murl);
-              
+            	// console.log(murl)
+              //设置各种递归情况    
+              if(isNull(murl)){
+                //排除无用的a链接
+                return;
+              }else if(isHttp(murl)){  
+                //找到murl第三次 / 出现的下标
+                var i3 = find(murl,'/',3);
+                var nurl = murl.substr(0,i3);
+                fetchre(nurl);
+              }else{
+                //以开始的域名作为根目录的情况进行递归
+                fetchre(url + murl); 
+              }
             }, timeout); 
             timeout += setting.ajax_timeout; 
-          } 
+          }
         }) 
       } 
     } 
@@ -79,7 +92,6 @@ function downloadImg(photos, dir, asyncNum) {
     if (filename) { 
       console.log('正在下载' + photo); 
       // 默认 
-      // fs.createWriteStream(dir + "/" + filename) 
       // 防止pipe错误 
       request(photo) 
         .on('error', function (err) { 
@@ -108,6 +120,30 @@ function IsURL(str_url) {
   } else { 
     return (false); 
   } 
+}
+//判断是否为无效链接
+function isNull(murl){
+  if(murl=='javascript:void(0)'||murl=='#'||murl=='/'||murl==undefined){
+    return true;
+  }else{
+    return false;
+  }
+}
+//判断是否为http或https开头
+function isHttp(murl){
+  if(murl.substr(0,7)=='http://'||murl.substr(0,8)=='https://'){
+    return true;
+  }else{
+    return false;
+  }
+}
+//查找一个字符在字符串第n次出现的下标
+function find(str,cha,num){
+  var x=str.indexOf(cha);
+    for(var i=0;i<num;i++){
+      x=str.indexOf(cha,x+1);
+    }
+  return x;
 }
 
 requestall(url); 
