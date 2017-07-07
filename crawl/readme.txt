@@ -2,3 +2,13 @@
 缺少一个判断网页是否已经被爬过的记录栈
 
 
+前提环境Node.js
+
+切换到文件目录：
+npm install   //引入依赖
+
+node app //运行
+
+打开app.js
+
+更改里面的变量 url （目标网站）= "http||https + ://域名"
