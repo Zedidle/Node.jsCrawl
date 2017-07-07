@@ -7,7 +7,7 @@ var cheerio = require("cheerio");
 var async = require('async'); 
 
 //目标网址(域名) 
-var url = 'http://www.4xart.com/'; 
+var url = 'https://www.fuhaodq.com/'; 
 
 
 //本地存储目录 
@@ -63,10 +63,10 @@ function requestall(url) {
             	// console.log(murl)
               //设置各种递归情况    
               if(isNull(murl)){
-                //排除无用的a链接
+                //排除无效链接
                 return;
               }else if(isHttp(murl)){  
-                //找到murl第三次 / 出现的下标
+                //记录murl第三次 / 出现的下标
                 var i3 = find(murl,'/',3);
                 var nurl = murl.substr(0,i3);
                 fetchre(nurl);
